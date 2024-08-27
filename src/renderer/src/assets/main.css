@@ -1,0 +1,9 @@
+@import './base.css';
+
+h1 {
+  text-align: center;
+}
+
+.table-container {
+  padding: 20px;
+}
