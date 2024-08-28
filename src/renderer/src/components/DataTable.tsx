@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from 'react';
-import { ipcRenderer } from 'electron';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,6 +7,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+
+// import { ipcRenderer } from 'electron';
+// You can't import any packages directly from your repo to renderer. You shoud bind everything via preload file. You already did it in fact, but just forgot to change this file.
+const { ipcRenderer } = window.electron;
 
 interface JobData {
   id: number;
