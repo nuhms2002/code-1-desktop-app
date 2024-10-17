@@ -14,10 +14,10 @@ const { ipcRenderer } = window.electron;
 
 interface JobData {
   id: number;
-  job_data: string;
+  job_date: string;
   passenger_name: string;
   passenger_phone: string;
-  pick_up: string;
+  pick_up_time: string;
   appointment_time: string;
   trip_type: string;
   start_address: string;
@@ -62,10 +62,10 @@ export default function BasicTable() {
           {jobs.map((job) => (
             <TableRow key={job.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell component="th" scope="row">{job.id}</TableCell>
-              <TableCell align="right">{job.job_data}</TableCell>
+              <TableCell align="right">{job.job_date}</TableCell>
               <TableCell align="right">{job.passenger_name}</TableCell>
               <TableCell align="right">{job.passenger_phone}</TableCell>
-              <TableCell align="right">{job.pick_up}</TableCell>
+              <TableCell align="right">{job.pick_up_time}</TableCell>
               <TableCell align="right">{job.appointment_time}</TableCell>
               <TableCell align="right">{job.trip_type}</TableCell>
               <TableCell align="right">{job.start_address}</TableCell>

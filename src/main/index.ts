@@ -105,6 +105,52 @@ function createWindow(): void {
 
 }
 
+ipcMain.handle('add-job', async (event, jobData) => {
+  return new Promise((resolve, reject) => {
+    const query = `INSERT INTO voucher (
+      job_date, passenger_name, passenger_phone, pick_up_time, appointment_time, 
+      trip_type, start_address, drop_off_address, second_drop_off_address, driver, total_charge
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    db.run(
+      query,
+      [
+        jobData.job_date,
+        jobData.passenger_name,
+        jobData.passenger_phone,
+        jobData.pick_up_time,
+        jobData.appointment_time,
+        jobData.trip_type,
+        jobData.start_address,
+        jobData.drop_off_address,
+        jobData.second_drop_off_address,
+        jobData.driver,
+        jobData.total_charge,
+      ],
+      (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ success: true });
+        }
+      }
+    );
+  });
+});
+
+// Register the IPC handler for removing a job
+ipcMain.handle('remove-job', async (event, jobId) => {
+  return new Promise((resolve, reject) => {
+    db.run(`DELETE FROM voucher WHERE id = ?`, [jobId], (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ success: true });
+      }
+    });
+  });
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -142,3 +188,4 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+ 
