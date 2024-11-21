@@ -38,8 +38,8 @@ function AddJobDialog({ open, onClose }) {
           <TextField label="Passenger Name" name="passenger_name" value={jobData.passenger_name} onChange={handleChange} variant="outlined" required />
           <TextField label="Passenger Phone" name="passenger_phone" value={jobData.passenger_phone} onChange={handleChange} variant="outlined" required />
           <TextField label="Trip Type" name="trip_type" value={jobData.trip_type} onChange={handleChange} variant="outlined" required />
-          <TextField label="Pick Up Time" type="time" name="pick_up_time" value={jobData.pick_up_time} onChange={handleChange} variant="outlined" required InputLabelProps={{ shrink: true }} />
-          <TextField label="Appointment Time" type="time" name="appointment_time" value={jobData.appointment_time} onChange={handleChange} variant="outlined" required InputLabelProps={{ shrink: true }} />
+          <TextField label="Pick Up Time" type="pick_up_time" name="pick_up_time" value={jobData.pick_up_time} onChange={handleChange} variant="outlined" required InputLabelProps={{ shrink: true }} />
+          <TextField label="Appointment Time" type="appointment_time" name="appointment_time" value={jobData.appointment_time} onChange={handleChange} variant="outlined" required InputLabelProps={{ shrink: true }} />
           <TextField label="Start Address" name="start_address" value={jobData.start_address} onChange={handleChange} variant="outlined" required />
           <TextField label="Drop Off Address" name="drop_off_address" value={jobData.drop_off_address} onChange={handleChange} variant="outlined" required />
           <TextField label="Second Drop Off Address" name="second_drop_off_address" value={jobData.second_drop_off_address} onChange={handleChange} variant="outlined" />

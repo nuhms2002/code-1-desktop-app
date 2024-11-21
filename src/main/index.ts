@@ -22,8 +22,8 @@ function initializeDatabase () {
    // Example: Create a table if it doesn't exist
    db.serialize(() => {
     db.run(
-      `CREATE TABLE IF NOT EXISTS voucher (
-    id SERIAL PRIMARY KEY,
+      `CREATE TABLE IF NOT EXISTS code1Voucher (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     job_date DATE NOT NULL,
     passenger_name VARCHAR(100) NOT NULL,
     passenger_phone VARCHAR(20) NOT NULL,
@@ -36,6 +36,7 @@ function initializeDatabase () {
     driver VARCHAR(100) NOT NULL,
     total_charge DECIMAL(10, 2) NOT NULL
 );`,
+
       (err) => {
         if (err) {
           console.error('Error creating table:', err);
@@ -55,7 +56,7 @@ const db = initializeDatabase();
 // IPC handler to get job data from the database
 ipcMain.handle('get-jobs', async (event) => {
   return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM voucher', [], (err, rows) => {
+    db.all('SELECT * FROM code1Voucher', [], (err, rows) => {
       if (err) {
         reject(err);
       } else {
@@ -107,7 +108,7 @@ function createWindow(): void {
 
 ipcMain.handle('add-job', async (event, jobData) => {
   return new Promise((resolve, reject) => {
-    const query = `INSERT INTO voucher (
+    const query = `INSERT INTO code1Voucher (
       job_date, passenger_name, passenger_phone, pick_up_time, appointment_time, 
       trip_type, start_address, drop_off_address, second_drop_off_address, driver, total_charge
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -141,7 +142,7 @@ ipcMain.handle('add-job', async (event, jobData) => {
 // Register the IPC handler for removing a job
 ipcMain.handle('remove-job', async (event, jobId) => {
   return new Promise((resolve, reject) => {
-    db.run(`DELETE FROM voucher WHERE id = ?`, [jobId], (err) => {
+    db.run(`DELETE FROM code1Voucher WHERE id = ?`, [jobId], (err) => {
       if (err) {
         reject(err);
       } else {

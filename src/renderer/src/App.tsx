@@ -14,10 +14,10 @@ function App(): JSX.Element {
     setJobs(jobs);
   };
 
-  // useEffect(() => {
-  //   fetchJobs();
-  // }, []);
-
+  //  useEffect(() => {
+  //    fetchJobs();
+  //  }, []);
+  
 
 
   const handleAddJobClick = () => {
