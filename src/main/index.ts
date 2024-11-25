@@ -113,6 +113,20 @@ ipcMain.handle('add-job', async (event, jobData) => {
       trip_type, start_address, drop_off_address, second_drop_off_address, driver, total_charge
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
+    const params = [
+      jobData.job_date,
+      jobData.passenger_name,
+      jobData.passenger_phone,
+      jobData.pick_up_time,
+      jobData.appointment_time,
+      jobData.trip_type,
+      jobData.start_address,
+      jobData.drop_off_address,
+      jobData.second_drop_off_address || null, // Handle optional fields
+      jobData.driver,
+      jobData.total_charge,
+    ];
+
     db.run(
       query,
       [

@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, FormGroup } from '@mui/material';
+import { JobData } from '../types/types'; // Adjust the path as needed
 
-function AddJobDialog({ open, onClose }) {
-  const [jobData, setJobData] = useState({
-    job_ID: '',
+interface AddJobDialogProps {
+  open: boolean; // Whether the dialog is open
+  onClose: () => void; // Callback to close the dialog
+  onJobAdded: (newJob: JobData) => void; // Callback for when a job is added
+}
+
+const AddJobDialog: React.FC<AddJobDialogProps> = ({ open, onClose, onJobAdded }) => {
+  const [jobData, setJobData] = useState<Omit<JobData, 'id'>>({
+    
     job_date: '',
     passenger_name: '',
     passenger_phone: '',
     pick_up_time: '',
     appointment_time: '',
-    trip_type: 'one-way',
+    trip_type: '',
     start_address: '',
     drop_off_address: '',
     second_drop_off_address: '',
@@ -17,23 +24,28 @@ function AddJobDialog({ open, onClose }) {
     total_charge: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setJobData({ ...jobData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
-    await window.electron.ipcRenderer.invoke('add-job', jobData);
-    console.log(jobData);
-    alert('Job added successfully!');
-    onClose();
+    try {
+      const result = await window.electron.ipcRenderer.invoke('add-job', jobData);
+      if (result.success) {
+        onJobAdded({ ...jobData, id: result.jobId }); // Pass the new job to the parent
+      }
+      onClose(); // Close the dialog after submission
+    } catch (error) {
+      console.error('Failed to add job:', error);
+    }
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Add Job</DialogTitle>
       <DialogContent>
-        <FormGroup>
-          <TextField label="Job ID" type='ID' name ="job_id" value={jobData.job_ID} onChange={handleChange} variant="outlined" required InputLabelProps={{shrink: true}} />
+      <FormGroup>
+          
           <TextField label="Job Date" type="date" name="job_date" value={jobData.job_date} onChange={handleChange} variant="outlined" required InputLabelProps={{ shrink: true }} />
           <TextField label="Passenger Name" name="passenger_name" value={jobData.passenger_name} onChange={handleChange} variant="outlined" required />
           <TextField label="Passenger Phone" name="passenger_phone" value={jobData.passenger_phone} onChange={handleChange} variant="outlined" required />
@@ -53,6 +65,6 @@ function AddJobDialog({ open, onClose }) {
       </DialogActions>
     </Dialog>
   );
-}
+};
 
 export default AddJobDialog;
