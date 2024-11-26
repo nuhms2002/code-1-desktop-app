@@ -11,6 +11,7 @@ const sqlite = sqlite3.verbose();
 
 function initializeDatabase () {
   const dbPath = join(app.getPath('userData'), 'code1sqldatabase.db');
+  console.log('Database Path:', dbPath); //see the location of sql file
   const db = new sqlite.Database(dbPath, (err) => {
     if (err) {
       console.error('Error opening Database');
@@ -29,7 +30,7 @@ function initializeDatabase () {
     passenger_phone VARCHAR(20) NOT NULL,
     pick_up_time TIME NOT NULL,
     appointment_time TIME NOT NULL,
-    trip_type VARCHAR(20) CHECK (trip_type IN ('one-way', 'round-trip', 'multiple')) NOT NULL,
+    trip_type VARCHAR(50) NOT NULL,
     start_address VARCHAR(255) NOT NULL,
     drop_off_address VARCHAR(255) NOT NULL,
     second_drop_off_address VARCHAR(255),

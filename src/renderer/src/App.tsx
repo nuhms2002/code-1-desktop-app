@@ -14,9 +14,13 @@ function App() {
 
   // Function to load jobs from the database
   const fetchJobs = async () => {
-    const jobs = await window.electron.ipcRenderer.invoke('get-jobs');
-    setJobs(jobs);  // Update the job list in state
-    setFilteredJobs(jobs); // Initialize the filtered jobs list with all jobs
+    try {
+      const jobs = await window.electron.ipcRenderer.invoke('get-jobs');
+      setJobs(jobs);  // Update the job list in state
+      setFilteredJobs(jobs); // Initialize the filtered jobs list with all jobs
+    } catch (error) {
+      console.error('failed to fetch jobs:', error);
+    }
   };
 
   // Fetch jobs when the component mounts
@@ -88,6 +92,13 @@ function App() {
         <DataTable jobs={filteredJobs} />
         <Button onClick={handleAddJobClick} variant="contained" color="primary">Add Job</Button>
         <Button onClick={handleRemoveJobClick} variant="contained" color="secondary">Remove Job</Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={fetchJobs} // Call fetchJobs to reload the data
+        >
+          Reload
+        </Button>
       </div>
 
       <AddJobDialog open={addJobOpen} onClose={handleCloseAddJob} onJobAdded={handleJobAdded} />
