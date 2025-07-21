@@ -2,70 +2,6 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import sqlite3 from 'sqlite3'
-
-
-const sqlite = sqlite3.verbose();
-
-
-
-function initializeDatabase () {
-  const dbPath = join(app.getPath('userData'), 'code1sqldatabase.db');
-  const db = new sqlite.Database(dbPath, (err) => {
-    if (err) {
-      console.error('Error opening Database');
-    } else {
-      console.log ('connected to the sqlite3 Database :)');
-    }
-  });
-
-   // Example: Create a table if it doesn't exist
-   db.serialize(() => {
-    db.run(
-      `CREATE TABLE IF NOT EXISTS voucher (
-    id SERIAL PRIMARY KEY,
-    job_date DATE NOT NULL,
-    passenger_name VARCHAR(100) NOT NULL,
-    passenger_phone VARCHAR(20) NOT NULL,
-    pick_up_time TIME NOT NULL,
-    appointment_time TIME NOT NULL,
-    trip_type VARCHAR(20) CHECK (trip_type IN ('one-way', 'round-trip', 'multiple')) NOT NULL,
-    start_address VARCHAR(255) NOT NULL,
-    drop_off_address VARCHAR(255) NOT NULL,
-    second_drop_off_address VARCHAR(255),
-    driver VARCHAR(100) NOT NULL,
-    total_charge DECIMAL(10, 2) NOT NULL
-);`,
-      (err) => {
-        if (err) {
-          console.error('Error creating table:', err);
-        } else {
-          console.log('Table created or already exists.');
-        }
-      }
-    );
-  });
-
-  return db;
-
-}
-
-const db = initializeDatabase();
-
-// IPC handler to get job data from the database
-ipcMain.handle('get-jobs', async (event) => {
-  return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM voucher', [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
-});
-
-
 
 function createWindow(): void {
   // Create the browser window.
@@ -99,7 +35,7 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  ipcMain.handle('get-app-path', (event) => {
+  ipcMain.handle('get-app-path', (_) => {
     return app.getAppPath(); // You can send any relevant path information here
   });
 
@@ -142,3 +78,4 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+ 
