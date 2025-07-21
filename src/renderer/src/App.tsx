@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from './components/DataTable';
 import { Button, TextField } from '@mui/material';
 import AddJobDialog from './components/AddJobDialog';
 import RemoveJobDialog from './components/RemoveJobDialog';
 import { JobData } from './types/types';
+import { fetchJobs } from './clientSideCalls/ApiCalls';
 
 function App() {
   const [jobs, setJobs] = useState<JobData[]>([]); // State to hold the list of jobs
@@ -12,20 +13,62 @@ function App() {
   const [addJobOpen, setAddJobOpen] = useState(false);
   const [removeJobOpen, setRemoveJobOpen] = useState(false);
 
-  // Function to load jobs from the database
-  const fetchJobs = async () => {
+  async function loadJobs() {
     try {
-      const jobs = await window.electron.ipcRenderer.invoke('get-jobs');
-      setJobs(jobs);  // Update the job list in state
-      setFilteredJobs(jobs); // Initialize the filtered jobs list with all jobs
+      const jobsData = await fetchJobs();
+      setJobs(jobsData);
+      setFilteredJobs(jobsData);
     } catch (error) {
-      console.error('failed to fetch jobs:', error);
+      console.log('failed to fetch jobs:', error);
     }
-  };
+  }
+
+  const addJob = async (jobData) => {
+    try {
+      const response = await fetch('http://localhost:5000/add-jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'applications/json',
+        },
+        body: JSON.stringify(jobData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('job added'); 
+      } else {
+        console.log("error adding job:", result.error)
+      }
+
+    } catch(err) {
+      console.error('network or server error:', err)
+    }
+  }
+
+  const removeJob = async (jobID) => {
+    try {
+      const response = await fetch('http://localhost:5000/remove-jobs', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'applications/josn'},
+    body: JSON.stringify ({id: jobID})
+    });
+    
+    if (!response.ok) throw new Error('Http ${response.status}');
+    const result = await response.json();
+    return Boolean(result.success);
+
+
+    } catch (error) {
+        console.error('Failed to remove job', error);
+      return false;                                                                  
+    }
+  } 
 
   // Fetch jobs when the component mounts
   useEffect(() => {
-    fetchJobs();
+    loadJobs();
   }, []);
 
   // Handle the search input change
@@ -89,16 +132,18 @@ function App() {
       
       <div className="table-container">
         {/* Pass the filtered jobs to the DataTable */}
-        <DataTable jobs={filteredJobs} />
-        <Button onClick={handleAddJobClick} variant="contained" color="primary">Add Job</Button>
-        <Button onClick={handleRemoveJobClick} variant="contained" color="secondary">Remove Job</Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={fetchJobs} // Call fetchJobs to reload the data
-        >
-          Reload
-        </Button>
+        
+          <DataTable jobs={filteredJobs} />
+          <Button onClick={handleAddJobClick} variant="contained" color="primary">Add Job</Button>
+          <Button onClick={handleRemoveJobClick} variant="contained" color="secondary">Remove Job</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={loadJobs} // Call loadJobs to reload the data
+          >
+            Reload
+          </Button>
+        
       </div>
 
       <AddJobDialog open={addJobOpen} onClose={handleCloseAddJob} onJobAdded={handleJobAdded} />

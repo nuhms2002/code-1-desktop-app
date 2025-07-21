@@ -2,72 +2,6 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import sqlite3 from 'sqlite3'
-
-
-const sqlite = sqlite3.verbose();
-
-
-
-function initializeDatabase () {
-  const dbPath = join(app.getPath('userData'), 'code1sqldatabase.db');
-  console.log('Database Path:', dbPath); //see the location of sql file
-  const db = new sqlite.Database(dbPath, (err) => {
-    if (err) {
-      console.error('Error opening Database');
-    } else {
-      console.log ('connected to the sqlite3 Database :)');
-    }
-  });
-
-   // Example: Create a table if it doesn't exist
-   db.serialize(() => {
-    db.run(
-      `CREATE TABLE IF NOT EXISTS code1Voucher (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    job_date DATE NOT NULL,
-    passenger_name VARCHAR(100) NOT NULL,
-    passenger_phone VARCHAR(20) NOT NULL,
-    pick_up_time TIME NOT NULL,
-    appointment_time TIME NOT NULL,
-    trip_type VARCHAR(50) NOT NULL,
-    start_address VARCHAR(255) NOT NULL,
-    drop_off_address VARCHAR(255) NOT NULL,
-    second_drop_off_address VARCHAR(255),
-    driver VARCHAR(100) NOT NULL,
-    total_charge DECIMAL(10, 2) NOT NULL
-);`,
-
-      (err) => {
-        if (err) {
-          console.error('Error creating table:', err);
-        } else {
-          console.log('Table created or already exists.');
-        }
-      }
-    );
-  });
-
-  return db;
-
-}
-
-const db = initializeDatabase();
-
-// IPC handler to get job data from the database
-ipcMain.handle('get-jobs', async (event) => {
-  return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM code1Voucher', [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
-});
-
-
 
 function createWindow(): void {
   // Create the browser window.
@@ -101,71 +35,11 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  ipcMain.handle('get-app-path', (event) => {
+  ipcMain.handle('get-app-path', (_) => {
     return app.getAppPath(); // You can send any relevant path information here
   });
 
 }
-
-ipcMain.handle('add-job', async (event, jobData) => {
-  return new Promise((resolve, reject) => {
-    const query = `INSERT INTO code1Voucher (
-      job_date, passenger_name, passenger_phone, pick_up_time, appointment_time, 
-      trip_type, start_address, drop_off_address, second_drop_off_address, driver, total_charge
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-    const params = [
-      jobData.job_date,
-      jobData.passenger_name,
-      jobData.passenger_phone,
-      jobData.pick_up_time,
-      jobData.appointment_time,
-      jobData.trip_type,
-      jobData.start_address,
-      jobData.drop_off_address,
-      jobData.second_drop_off_address || null, // Handle optional fields
-      jobData.driver,
-      jobData.total_charge,
-    ];
-
-    db.run(
-      query,
-      [
-        jobData.job_date,
-        jobData.passenger_name,
-        jobData.passenger_phone,
-        jobData.pick_up_time,
-        jobData.appointment_time,
-        jobData.trip_type,
-        jobData.start_address,
-        jobData.drop_off_address,
-        jobData.second_drop_off_address,
-        jobData.driver,
-        jobData.total_charge,
-      ],
-      (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ success: true });
-        }
-      }
-    );
-  });
-});
-
-// Register the IPC handler for removing a job
-ipcMain.handle('remove-job', async (event, jobId) => {
-  return new Promise((resolve, reject) => {
-    db.run(`DELETE FROM code1Voucher WHERE id = ?`, [jobId], (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ success: true });
-      }
-    });
-  });
-});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -12,5 +12,6 @@ export interface JobData {
     driver: string;
     total_charge: string;
   }
+  
 
   

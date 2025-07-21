@@ -1,5 +1,4 @@
 
-import { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,9 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {JobData} from '../types/types';
-// import { ipcRenderer } from 'electron';
-// You can't import any packages directly from your repo to renderer. You shoud bind everything via preload file. You already did it in fact, but just forgot to change this file.
-//const { ipcRenderer } = window.electron;
+
 
 interface DataTableProps {
   jobs: JobData[];
@@ -20,12 +17,13 @@ const DataTable: React.FC<DataTableProps> = ({ jobs }) => {
 
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+    
+    <TableContainer component={Paper} sx={{maxHeight: 800, overflowY: 'auto'}}>
+      <Table sx={{ }} aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell align="right">Job Data</TableCell>
+            <TableCell align="right">Job Date</TableCell>
             <TableCell align="right">Passenger Name</TableCell>
             <TableCell align="right">Passenger Phone</TableCell>
             <TableCell align="right">Pick Up</TableCell>

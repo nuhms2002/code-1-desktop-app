@@ -19,7 +19,9 @@
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
-    "start:prod": "electron dist"
+    "start:prod": "electron dist",
+    "server": "ts-node backend/server.ts",
+    "rebuild": "electron-rebuild"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
@@ -27,6 +29,9 @@
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^5.16.6",
+    "@supabase/supabase-js": "^2.50.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
@@ -39,12 +44,14 @@
     "@vitejs/plugin-react": "^4.3.1",
     "electron": "^31.0.2",
     "electron-builder": "^24.13.3",
+    "electron-rebuild": "^3.2.9",
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.3",
     "prettier": "^3.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.2",
     "vite": "^5.3.1"
   }
