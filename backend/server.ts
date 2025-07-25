@@ -35,19 +35,9 @@ server.get('/get-jobs', async (req, res) => {
 server.post('/add-jobs', async (req, res) => {
     console.log("request body", req.body);
     const JobData = req.body
-
-    //filter out empty string entries and replaces it with null value so empty values can be passed for jobs
-    const cleanJobData = Object.fromEntries(
-        Object.entries(JobData).map(([key, value]) => [key, value === '' ? null: value]
-    )
-    )
-
-    JobData.entries(
-
-    )
     const {data, error} = await supabase
     .from('code1voucher')
-    .insert([cleanJobData])
+    .insert([JobData])
     .select();
 
     if (error) {
