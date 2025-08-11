@@ -67,3 +67,25 @@ server.post('/remove-jobs', async (req, res) => {
     console.log('Job removed successfully, sending response');
     res.json({ success: true, message: "Job removed successfully" });
 })
+
+server.put('/edit-job', async(req, res) => {
+    try {
+        const jobData = req.body;
+        const jobID = jobData.id;
+        const {id, ...updateData} = jobData;
+        
+        const {data, error} = await supabase
+            .from('code1voucher')
+            .update(updateData)
+            .eq('id', jobID)
+            .select();
+
+        if (error) {
+            return res.status(500).json({ success: false, error: "Failed to update job" });
+        }
+
+        res.json({ success: true, job: data[0] });
+    } catch (error) {
+        res.status(500).json({ success: false, error: "Internal server error" });
+    }
+})

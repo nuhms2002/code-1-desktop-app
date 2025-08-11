@@ -1,20 +1,14 @@
 
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper  } from '@mui/material';
 import {JobData} from '../types/types';
 
 
 interface DataTableProps {
   jobs: JobData[];
+  onEditJob?: (job: JobData) => void;
 }
 
-const DataTable: React.FC<DataTableProps> = ({ jobs }) => {
-
+const DataTable: React.FC<DataTableProps> = ({ jobs, onEditJob }) => {
 
   return (
     
@@ -34,6 +28,7 @@ const DataTable: React.FC<DataTableProps> = ({ jobs }) => {
             <TableCell align="right">Second Drop Off Address</TableCell>
             <TableCell align="right">Driver</TableCell>
             <TableCell align="right">Total Charge</TableCell>
+            <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -51,6 +46,14 @@ const DataTable: React.FC<DataTableProps> = ({ jobs }) => {
               <TableCell align="right">{job.second_drop_off_address}</TableCell>
               <TableCell align="right">{job.driver}</TableCell>
               <TableCell align="right">{job.total_charge}</TableCell>
+              <TableCell align="right">
+                <Button
+                variant="outlined" 
+                    size="small"
+                    onClick={() => onEditJob?.(job)}
+                >
+                  Edit</Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

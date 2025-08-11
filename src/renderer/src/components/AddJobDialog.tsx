@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, FormGroup, Stack } from '@mui/material';
 import { JobData } from '../types/types'; // Adjust the path as needed
-import { addJob } from '../clientSideCalls/ApiCalls';
+import { addJob, editJob  } from '../clientSideCalls/ApiCalls';
 
 //polina
 
@@ -9,10 +9,12 @@ interface AddJobDialogProps {
   open: boolean; // Whether the dialog is open
   onClose: () => void; // Callback to close the dialog
   onJobAdded: (newJob: JobData) => void; // Callback for when a job is added
+  mode?: 'add' | 'edit';
+  initialData?: JobData; // For pre-filling in edit mode
+  onJobUpdated?: (updatedJob: JobData) => void;
 }
 
 const required = ['job_date', 'passenger_name', 'passenger_phone', 'appointment_time', 'trip_type', 'start_address', 'drop_off_address']
-
 
 const IntialJobDialog: Omit<JobData, 'id'> = {
     job_date: '',
@@ -28,8 +30,7 @@ const IntialJobDialog: Omit<JobData, 'id'> = {
     total_charge: '',
 };
 
-
-const AddJobDialog: React.FC<AddJobDialogProps> = ( {open, onClose, onJobAdded} ) => {
+const AddJobDialog: React.FC<AddJobDialogProps> = ( {open, onClose, onJobAdded, mode = 'add', initialData, onJobUpdated} ) => {
   const [missingField, setMissingField] = useState<string[]>([]);
   const [jobData, setJobData] = useState<Omit<JobData, 'id'>>({
     
@@ -46,6 +47,16 @@ const AddJobDialog: React.FC<AddJobDialogProps> = ( {open, onClose, onJobAdded} 
     total_charge: '',
   });
 
+ useEffect(() => {
+  if (mode === 'edit' && initialData) {
+    // Remove the id field since jobData doesn't have it
+    const { id, ...jobDataWithoutId } = initialData;
+    setJobData(jobDataWithoutId);
+  } else {
+    setJobData(IntialJobDialog);
+  }
+  }, [mode, initialData]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setJobData({ ...jobData, [e.target.name]: e.target.value });
     if (missingField.includes(e.target.name)) {
@@ -60,14 +71,26 @@ const AddJobDialog: React.FC<AddJobDialogProps> = ( {open, onClose, onJobAdded} 
 
   const handleSubmit = async () => {
     try {
-    
-      console.log(jobData); 
-      await addJob(jobData);
-      onJobAdded({ ...jobData, id: Date.now() }); // Pass the new job to the parent
-      setJobData(IntialJobDialog);
-      onClose(); // Close the dialog after submission
+      if (mode === 'edit' && initialData) {
+        console.log('Editing job:', jobData); 
+        const jobDataWithId: JobData = {
+        ...jobData,
+        id: initialData.id
+        };
+        await editJob(jobDataWithId);
+        if (onJobUpdated) {
+          onJobUpdated(jobDataWithId);
+        }
+        onClose(); // Close the dialog after submission
+      } else {
+        console.log('Adding new job:', jobData);
+        await addJob(jobData);
+        onJobAdded({ ...jobData, id: Date.now() }); // Pass the new job to the parent
+        setJobData(IntialJobDialog);
+        onClose(); // Close the dialog after submission
+      }
     } catch (error) {
-      console.error('Failed to add job:', error);
+      console.error('Failed to submit job:', error);
     }
   };
 
@@ -86,7 +109,7 @@ const AddJobDialog: React.FC<AddJobDialogProps> = ( {open, onClose, onJobAdded} 
   
   return (
     <Dialog open={open} onClose={onClose} >
-      <DialogTitle>Add Job</DialogTitle>
+      <DialogTitle>{mode === 'edit' ? 'Edit Job' : 'Add Job'}</DialogTitle>
       <DialogContent >
       <FormGroup>
           <Stack spacing = {2} sx = {{marginTop : 2}}>
@@ -187,9 +210,7 @@ const AddJobDialog: React.FC<AddJobDialogProps> = ( {open, onClose, onJobAdded} 
               InputProps={{ inputProps: { min: 0, step: 0.01 }}} 
               
             />
-          {/* 
-          if form required forms not filled. You can't submit
-           */}
+          
           </Stack>
         </FormGroup>
       </DialogContent>
@@ -203,7 +224,7 @@ const AddJobDialog: React.FC<AddJobDialogProps> = ( {open, onClose, onJobAdded} 
              setMissingField(missing);
           }
         }}
-           color="primary">Add Job</Button>
+           color="primary">{mode === 'edit' ? 'Update Job' : 'Add Job'}</Button>
         <Button onClick={resetForm}>Reset</Button>
       </DialogActions>
     </Dialog>

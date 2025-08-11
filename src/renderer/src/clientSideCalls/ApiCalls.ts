@@ -1,4 +1,6 @@
-export const fetchJobs = async () => {
+import { JobData } from '../types/types';
+
+export const fetchJobs = async (): Promise<JobData[]> => {
   try {
     const response = await fetch('http://localhost:5000/get-jobs');
     const data = await response.json();
@@ -9,7 +11,8 @@ export const fetchJobs = async () => {
   }
 }
 
-export const addJob = async (jobData) => {
+
+export const addJob = async (jobData: Omit<JobData, 'id'>) => {
   console.log("attempting to add job using jobData", jobData);
   try {
     const requestBody = JSON.stringify(jobData);
@@ -36,7 +39,8 @@ export const addJob = async (jobData) => {
   }
 }
 
-export const removeJob = async (jobID) => {
+
+export const removeJob = async (jobID: number): Promise<boolean> => {
   console.log('Attempting to remove job with ID:', jobID);
   try {
     const requestBody = JSON.stringify({id: jobID});
@@ -62,3 +66,30 @@ export const removeJob = async (jobID) => {
     return false;                                                                  
   }
 } 
+
+export const editJob = async (jobData: JobData) => {
+  console.log("attempting to edit job using jobData", jobData);
+  try {
+    const requestBody = JSON.stringify(jobData);
+    
+    const response = await fetch('http://localhost:5000/edit-job', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: requestBody,
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      console.log('job updated successfully'); 
+      return result;
+    } else {
+      throw new Error(result.error);
+    }
+  } catch(err) {
+    console.error('network or server error:', err)
+    throw err;
+  }
+}
